@@ -4,3 +4,6 @@ body {
 .brand-logo img{
     max-height: 50px;
 }
+.modal {
+    width: 25%;
+}

@@ -59,6 +59,7 @@ $routes = [
     'layout' => 'layout.php',
     'api' => 'api.php',
     '' => 'index.php',
+    'signup' => 'signup.php'
 ];
 
 if(isset($routes[$uri])) { // у маршрутах є відповідний запис
