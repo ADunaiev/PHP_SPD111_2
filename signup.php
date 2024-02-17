@@ -6,25 +6,25 @@
             <div class="row">
                 
                 <div class="input-field col s6">
-                    <input id="user-email" type="email" class="validate">
+                    <input id="user-email" name="user-email" type="email" class="validate">
                     <label for="user-email">Email</label>
                     <span class="helper-text" data-error="wrong" data-success="right">Email</span>
                 </div>
 
                 <div class="input-field col s6">
-                    <input id="user-name" type="text" class="validate">
+                    <input id="user-name" name="user-name" type="text" class="validate">
                     <label for="user-name">Ім'я</label>
                     <span class="helper-text" data-error="wrong" data-success="right">Використовувайте лише літери</span>
                 </div>
 
                 <div class="input-field col s6">
-                    <input id="user-password" type="password" class="validate">
+                    <input id="user-password" name="user-password" type="password" class="validate">
                     <label for="user-password">Пароль</label>
                     <span class="helper-text" data-error="wrong" data-success="right">Пароль</span>
                 </div>
 
                 <div class="input-field col s6">
-                    <input id="user-repeat-password" type="password" class="validate">
+                    <input id="user-repeat-password" name="user-repeat" type="password" class="validate">
                     <label for="user-repeat-password">Повторить пароль</label>
                     <span class="helper-text" data-error="wrong" data-success="right">Повторить пароль</span>
                 </div>
@@ -32,7 +32,7 @@
                 <div class="file-field input-field col s9">
                     <div class="btn">
                         <span>Аватар</span>
-                        <input id="avatar-file" type="file">
+                        <input id="avatar-file" name="user-avatar" type="file">
                     </div>
                     <div class="file-path-wrapper">
                         <input  id="avatar-file-path" class="file-path validate" type="text">
@@ -46,7 +46,7 @@
     </div>
     <div class="row">
         <div class="col s3">
-            <button type="submit" class="btn">Реєстрація</button>
+            <button type="button" class="btn" id="signup-button">Реєстрація</button>
         </div>
     </div>
 </form>

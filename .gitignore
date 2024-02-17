@@ -1,4 +1,11 @@
 # CakePHP 3
+cert.key
+cert.cer
+cert.pfx
+
+
+/server-logs/access.log
+/server-logs/error.log
 
 /vendor/*
 /config/app.php
