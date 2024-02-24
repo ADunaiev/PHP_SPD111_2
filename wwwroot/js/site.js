@@ -7,9 +7,42 @@ document.addEventListener('DOMContentLoaded', () => {
         signUpButton.onclick = signupButtonClick;
     }
 
+    const authButton = document.getElementById("auth-button");
+    if(authButton){
+        authButton.onclick = authButtonClick;
+    }
+
     var elems = document.querySelectorAll('.modal');
-    var instances = M.Modal.init(elems);
+    //var instances = M.Modal.init(elems);
+
+    M.Modal.init(elems, {
+		"opacity": 	    	0.5, 	// Opacity of the modal overlay.
+		"inDuration": 		250, 	// Transition in duration in milliseconds.
+		"outDuration": 		250, 	// Transition out duration in milliseconds.
+		"onOpenStart": 		null,	// Callback function called before modal is opened.
+		"onOpenEnd": 		null,	// Callback function called after modal is opened.
+		"onCloseStart":		null,	// Callback function called before modal is closed.
+		"onCloseEnd": 		null,	// Callback function called after modal is closed.
+		"preventScrolling": true,	// Prevent page from scrolling while modal is open.
+		"dismissible": 		true,	// Allow modal to be dismissed by keyboard or overlay click.
+		"startingTop": 		'4%',	// Starting top offset
+		"endingTop": 		'10%'	// Ending top offset
+	});
 });
+
+function authButtonClick(e) {
+    const authEmailInput = document.querySelector('input[name="sign-in-email"]');
+    if(!authEmailInput) {throw "authEmailInput not found";}
+
+    const authPasswordInput = document.querySelector('input[name="sign-in-password"]');
+    if(!authPasswordInput) {throw "authPasswordInput not found";}
+
+    fetch(`/auth?email=${authEmailInput.value}&password=${authPasswordInput.value}`, {
+        method: 'PATCH'
+    })
+        .then(r => r.json())
+        .then(console.log);
+}
 
 function signupButtonClick(e) {
     // console.log("signup button clicked");
@@ -53,7 +86,15 @@ function signupButtonClick(e) {
             body: formData
         })
             .then( r => r.json())
-            .then(console.log) ;
+            .then(j => {
+                if(j.status == 1) { // реєстрація успішна
+                    alert('реэстрація успішна');
+                    window.location = "/";
+                }
+                else { // помилка реєстрації (повідомлення у полі месседж)
+                    alert(j.data.message);
+                }
+            }) ;
     }
 
 }

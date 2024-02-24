@@ -1,6 +1,8 @@
 	<pre>
 	PHP 
 	Hypertext Preprocessor
+	<img alt="picture" src="screen-shots/homework1002/Знімок екрана 2024-02-13 231252.png">
+	<img class="responsive-img" src="img/PHP_logo.png">
 	Мова програмування, початково призначена для покращення можливостей
 	HTML (змінні, інструкції, вирази, файли/шаблони)
 	На сьогодні - повноцінна мова програмування, яка частіше за все

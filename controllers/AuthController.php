@@ -25,6 +25,66 @@ class AuthController extends ApiController {
         echo "Hello from do_get - Query OK"; 
     }
 
+    /* автентифікація користувача */
+
+    protected function do_patch() {
+        $result = [ // REST - як шаблон 
+            'status' => 0,
+            'meta' => [
+                'api' => 'auth',
+                'service' => 'authentication',
+                'time' => time()
+            ],
+            'data' => [
+                'message' => $_GET
+            ],
+        ];
+
+        if(empty($_GET['email'])) {
+            $result['data']['message'] = "Missing required parameter: 'email'";
+            $this->end_with($result);
+        }
+        $email = trim($_GET['email']);
+
+        if(empty($_GET['password'])) {
+            $result['data']['message'] = "Missing required parameter: 'password'";
+            $this->end_with($result);
+        }
+        $password = $_GET['password'];
+
+        $sql = "SELECT * FROM users u WHERE u.email = ? AND u.password = ?";
+        $db = $this->connect_db_or_exit();
+        try {
+            $prep = $db->prepare($sql);
+            // запис виконюється з передачею параметрів
+            $prep->execute([
+                $email,
+                md5($password)
+            ]);
+            $res = $prep->fetch();
+            //$result['data']['message'] = var_export( $res, true);
+
+            if ($res === false) {
+                $result['data']['message'] = "Credentials rejected!";
+                $this->end_with($result);
+            }
+
+
+        }
+        catch(PDOException $ex) {
+            http_response_code(500);
+            echo "Connection error: " . $ex->getMessage();
+            exit;
+        }
+        // робота з сесіями
+        session_start();
+        $_SESSION['user'] = $res;
+        $_SESSION['auth-moment'] = time();
+
+        $result['status'] = 1;
+        $this->end_with( $result );
+    }
+
     /**
      * Реєстрація нового користувача (Create)
      */
@@ -36,7 +96,7 @@ class AuthController extends ApiController {
             'post' => $_POST,
             'files' => $_FILES,
         ];*/
-        $result = [
+        $result = [ // REST - як шаблон 
             'status' => 0,
             'meta' => [
                 'api' => 'auth',
@@ -47,6 +107,37 @@ class AuthController extends ApiController {
                 'message' => ""
             ],
         ];
+        if(empty($_POST['user-name'])) {
+            $result['data']['message'] = "Missing required parameter: 'user-name'";
+            $this->end_with($result);
+        }
+        $user_name = trim($_POST['user-name']);
+        if(empty($_POST['user-email'])) {
+            $result['data']['message'] = "Missing required parameter: 'user-email'";
+            $this->end_with($result);
+        }
+        $user_email = trim($_POST['user-email']);
+
+        if(empty($_POST['user-password'])) {
+            $result['data']['message'] = "Missing required parameter: 'user-password'";
+            $this->end_with($result);
+        }
+        $user_password = $_POST['user-password'];
+
+        if(strlen($user_name) < 2) {
+            $result['data']['message'] = "Validation violation: 'user-name' is too short";
+            $this->end_with($result);
+        }
+        if( preg_match('/\d/', $user_name)) {
+            $result['data']['message'] = 
+                "Validation violation: 'user-name' must not contain digit(s)";
+            $this->end_with($result);
+        }
+
+        if(empty($_POST['user-name'])) {
+            $result['data']['message'] = "Missing required parameter: 'user-name'";
+        }
+        $filename = "";
         if(! empty($_FILES['user-avatar'])){
             // файл опціональний, але якщо переданий, то перевіряємо його
             if (
@@ -75,16 +166,42 @@ class AuthController extends ApiController {
                 $_FILES['user-avatar']['tmp_name'], 
                 "./wwwroot/avatar/" . $filename
             );
+        }
+        /* Запити до бд поділяються на 2 типи: звичайні та підготовлені. 
+        У звичайних запитах дані підставляються у текст запиту. У підготовлених 
+        ідуть окремо. Звичайні запити виконуються за один акт комунікації бд та php.
+        Підготовлені щонайменьше за два. Перший запит готує, другий передає дані. 
+        Хоча підготовлені запити призначені для повторного (багаторазового) використання, 
+        вони мають значно кращі параметри безпеки щодо "SQL-інєкцій.
+        Тому їх використання (підготовленних запитів) рекомендується у всіх випадках, 
+        коли у запит додаються дані, що приходять від користувача (зовні). 
+        "*/
 
-
-
-
+        $db = $this->connect_db_or_exit();
+        // виконання запитів
+        // у запиті залишаються placeholders - знаки "?"
+        $sql = "INSERT INTO users (`email`, `name`, `password`, `avatar`)
+                VALUES(?,?,?,?)";
+        try {
+            $prep = $db->prepare($sql);
+            // запис виконюється з передачею параметрів
+            $prep->execute([
+                $user_email,
+                $user_name,
+                md5($user_password),
+                $filename
+            ]);
+        }
+        catch(PDOException $ex) {
+            http_response_code(500);
+            echo "Connection error: " . $ex->getMessage();
+            exit;
         }
 
-        $result['data']['status'] = 1;
+        $result['status'] = 1;
         $result['data']['message'] = "Signup OK";
         $this->end_with($result);
-
+        
     }
 }
 
